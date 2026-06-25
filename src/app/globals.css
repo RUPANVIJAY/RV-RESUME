@@ -1,26 +1,185 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
+@theme {
+  /* Colors */
+  --color-surface: #fcf9f1;
+  --color-surface-dim: #dcdad2;
+  --color-surface-bright: #fcf9f1;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f6f3eb;
+  --color-surface-container: #f1eee6;
+  --color-surface-container-high: #ebe8e0;
+  --color-surface-container-highest: #e5e2db;
+  --color-on-surface: #1c1c17;
+  --color-on-surface-variant: #44474f;
+  --color-inverse-surface: #31312c;
+  --color-inverse-on-surface: #f3f1e9;
+  --color-outline: #747780;
+  --color-outline-variant: #c4c6d0;
+  --color-surface-tint: #425e91;
+  --color-primary: #002452;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #1b3a6b;
+  --color-on-primary-container: #89a5dd;
+  --color-inverse-primary: #acc7ff;
+  --color-secondary: #9c4500;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #ff7a1b;
+  --color-on-secondary-container: #5e2700;
+  --color-tertiary: #18272e;
+  --color-on-tertiary: #ffffff;
+  --color-tertiary-container: #2d3d44;
+  --color-on-tertiary-container: #97a7b0;
+  --color-error: #ba1a1a;
+  --color-on-error: #ffffff;
+  --color-error-container: #ffdad6;
+  --color-on-error-container: #93000a;
+  --color-primary-fixed: #d7e2ff;
+  --color-primary-fixed-dim: #acc7ff;
+  --color-on-primary-fixed: #001a40;
+  --color-on-primary-fixed-variant: #294678;
+  --color-secondary-fixed: #ffdbca;
+  --color-secondary-fixed-dim: #ffb68e;
+  --color-on-secondary-fixed: #331200;
+  --color-on-secondary-fixed-variant: #773300;
+  --color-tertiary-fixed: #d4e5ee;
+  --color-tertiary-fixed-dim: #b8c9d2;
+  --color-on-tertiary-fixed: #0e1e24;
+  --color-on-tertiary-fixed-variant: #394950;
   --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-on-background: var(--foreground);
+  --color-surface-variant: #e5e2db;
+
+  /* Fonts */
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jetbrains-mono);
+  --font-heading: var(--font-space-grotesk);
+
+  /* Spacing */
+  --spacing-unit: 4px;
+  --spacing-gutter: 24px;
+  --spacing-margin-page: 48px;
+  --spacing-column-gap: 24px;
 }
 
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #faf7ef;
+    --foreground: #1b3a6b;
+    --accent: #ff7a1a;
+  }
+  .dark {
+    --background: #0c2236;
+    --foreground: #dcedf6;
+    --accent: #ff7a1a;
+  }
+  
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    background-image: linear-gradient(to right, color-mix(in srgb, var(--foreground) 8%, transparent) 1px, transparent 1px),
+      linear-gradient(to bottom, color-mix(in srgb, var(--foreground) 8%, transparent) 1px, transparent 1px);
+    background-size: 24px 24px;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer utilities {
+  .text-heading-xl {
+    font-family: var(--font-heading);
+    font-size: 48px;
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+  .text-heading-lg {
+    font-family: var(--font-heading);
+    font-size: 32px;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+  .text-heading-lg-mobile {
+    font-family: var(--font-heading);
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+  .text-body-md {
+    font-family: var(--font-sans);
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.6;
+  }
+  .text-label-sm {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.4;
+    letter-spacing: 0.05em;
+  }
+  .text-annotation {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 400;
+    line-height: 1.2;
+    text-transform: uppercase;
+  }
 }
+
+
+        .tech-grid {
+            background-size: 32px 32px;
+            background-image: 
+                linear-gradient(to right, rgba(27, 58, 107, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(27, 58, 107, 0.05) 1px, transparent 1px);
+        }
+        
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        
+        .crop-marks {
+            position: relative;
+        }
+        .crop-marks::before, .crop-marks::after {
+            content: '';
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-color: theme('colors.secondary-container');
+        }
+        .crop-marks-top-left::before { top: -2px; left: -2px; border-top: 2px solid; border-left: 2px solid; }
+        .crop-marks-top-right::after { top: -2px; right: -2px; border-top: 2px solid; border-right: 2px solid; }
+        .crop-marks-bottom-left::before { bottom: -2px; left: -2px; border-bottom: 2px solid; border-left: 2px solid; }
+        .crop-marks-bottom-right::after { bottom: -2px; right: -2px; border-bottom: 2px solid; border-right: 2px solid; }
+
+        .hatched-fill {
+            background-image: repeating-linear-gradient(
+                45deg,
+                theme('colors.secondary-container'),
+                theme('colors.secondary-container') 2px,
+                transparent 2px,
+                transparent 6px
+            );
+        }
+
+        .scroll-fade {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .scroll-fade.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .input-underline {
+            border: none;
+            border-bottom: 1px solid theme('colors.primary-container');
+            background: transparent;
+            border-radius: 0;
+        }
+        .input-underline:focus {
+            box-shadow: none;
+            border-bottom-color: theme('colors.secondary-container');
+        }
+    
