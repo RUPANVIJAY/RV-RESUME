@@ -2,9 +2,35 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 
+const projectsData = [
+  {
+    id: "PROJ_01",
+    title: "AI-Driven Intelligent Liquid Cooling Vest",
+    subtitle: "Adaptive Thermal Regulation System",
+    description: "Interdisciplinary project (1st Sem) focused on a group of 5 students from various engineering branches. Developed an AI-driven system for adaptive thermal regulation using liquid cooling technology.",
+    image: "https://lh3.googleusercontent.com/aida/AP1WRLsoDzxWz4IQyJHhunPn1FfDj0ii_tMGYQUecBAsFri4zsNdReO7nCdZ_O_aHeswVLdIPeVP6fk8-3IQWdyo6STUfBTS4IREeCLZmlTV3r9Ue58odBes4hQsjNE5BnYGVeODY_VXEgYYD88kJTuVsg8uSSVz041I7Zx-a_V4fKvTmApI4wV-6sTZ2-KuE8oLp4Fw-IDmxSN9N7o5xw44M_9H9N6zLABAnMD007m7Ly3VkFOIR6ToOrOLeWpm",
+    team: "Group of 5 (Interdisciplinary)"
+  },
+  {
+    id: "PROJ_02",
+    title: "Thermal Simulation",
+    subtitle: "MATLAB",
+    description: "Detailed thermal simulation and analysis using MATLAB. Focuses on heat dissipation modeling and predictive thermal profiling for high-stress engineering environments.",
+    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuAVWHnbPxWWu47Boqpf7Pz1BiZLa4MYUUnr4TR59xjFhq1n60FP5mYNDUbYpUVaoQq_fuaOcqNTOvDUwoEWUjC9DR8w5Aq2rb_FMZkPbliFicb1v-nxt3t1yEc7zE7mMgQCjHKAI1NoodXFJ8KhqXEzr0T64WWcf1pEmr1yuPxkPz-Z9SuO8wEUyydthgjSkpbOfiU1ZJ9PI9yfTQZP2SSPxqJq-6yzJeV7SDWuwVLF2odny6rkP_zViQcHL5JF443V-geaOgoAe9VI",
+  },
+  {
+    id: "PROJ_03",
+    title: "Data Analysis Script",
+    subtitle: "Python",
+    description: "Python-based data analysis script for experimental results. Utilizes Pandas and NumPy for rapid dataset parsing and statistical distribution modeling.",
+    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuAVWHnbPxWWu47Boqpf7Pz1BiZLa4MYUUnr4TR59xjFhq1n60FP5mYNDUbYpUVaoQq_fuaOcqNTOvDUwoEWUjC9DR8w5Aq2rb_FMZkPbliFicb1v-nxt3t1yEc7zE7mMgQCjHKAI1NoodXFJ8KhqXEzr0T64WWcf1pEmr1yuPxkPz-Z9SuO8wEUyydthgjSkpbOfiU1ZJ9PI9yfTQZP2SSPxqJq-6yzJeV7SDWuwVLF2odny6rkP_zViQcHL5JF443V-geaOgoAe9VI",
+  }
+];
+
 export default function Home() {
   const [heroPhase, setHeroPhase] = useState(0); 
   const [typedName, setTypedName] = useState("");
+  const [selectedProject, setSelectedProject] = useState<typeof projectsData[0] | null>(null);
 
   useEffect(() => {
     const phase1Timer = setTimeout(() => {
@@ -54,15 +80,16 @@ export default function Home() {
                 });
 
                 // Trigger counters
-                const counters = entry.target.querySelectorAll('.counter');
+                const counters = entry.target.querySelectorAll('.counter, .skill-counter');
                 counters.forEach(counter => {
                     const el = counter as HTMLElement;
                     const targetAttr = el.getAttribute('data-target');
                     const target = targetAttr ? parseFloat(targetAttr) : 0;
                     const decimalsAttr = el.getAttribute('data-decimals');
                     const decimals = decimalsAttr ? parseInt(decimalsAttr) : 0;
-                    const duration = 2000;
-                    const stepTime = 50;
+                    const isSkill = el.classList.contains('skill-counter');
+                    const duration = isSkill ? 1200 : 2000;
+                    const stepTime = isSkill ? 20 : 50;
                     const steps = duration / stepTime;
                     const increment = target / steps;
                     let current = 0;
@@ -73,11 +100,16 @@ export default function Home() {
                             current = target;
                             clearInterval(updateCounter);
                         }
-                        if (el.textContent !== current.toFixed(decimals)) {
-                          el.textContent = current.toFixed(decimals);
+                        if (isSkill) {
+                            el.textContent = current.toFixed(0) + '%';
+                        } else {
+                            if (el.textContent !== current.toFixed(decimals)) {
+                              el.textContent = current.toFixed(decimals);
+                            }
                         }
                     }, stepTime);
                     el.classList.remove('counter'); // Prevent re-trigger
+                    el.classList.remove('skill-counter');
                 });
 
                 observer.unobserve(entry.target);
@@ -85,7 +117,7 @@ export default function Home() {
         });
     }, observerOptions);
 
-    document.querySelectorAll('.scroll-fade, #skills, .counter').forEach((el) => {
+    document.querySelectorAll('.scroll-fade, #skills, .counter, .project-card-reveal, .timeline-item').forEach((el) => {
         observer.observe(el);
     });
 
@@ -102,6 +134,41 @@ export default function Home() {
           if (themeText) themeText.textContent = isDark ? 'MODE_02: BLUEPRINT' : 'MODE_01: WHITEPRINT';
       });
     }
+
+    const magneticElements = document.querySelectorAll('.magnetic-el');
+    magneticElements.forEach((el) => {
+        el.addEventListener('mousemove', (e: Event) => {
+            const mouseEvent = e as MouseEvent;
+            const rect = el.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            const distX = (mouseEvent.clientX - centerX) / rect.width;
+            const distY = (mouseEvent.clientY - centerY) / rect.height;
+            const moveX = distX * 12; 
+            const moveY = distY * 12;
+            (el as HTMLElement).style.transform = `translate(${moveX}px, ${moveY}px)`;
+        });
+        el.addEventListener('mouseleave', () => {
+            (el as HTMLElement).style.transform = `translate(0px, 0px)`;
+        });
+    });
+
+    const handleScroll = () => {
+        const container = document.querySelector('.timeline-container');
+        const line = document.querySelector('.timeline-line');
+        if (!container || !line) return;
+        const rect = container.getBoundingClientRect();
+        const startOffset = window.innerHeight * 0.75;
+        let progress = (startOffset - rect.top) / rect.height;
+        progress = Math.max(0, Math.min(1, progress));
+        (line as HTMLElement).style.height = `${progress * 100}%`;
+    };
+    window.addEventListener('scroll', handleScroll);
+    handleScroll();
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
   }, []);
 
   return (
@@ -112,16 +179,16 @@ export default function Home() {
 <div className="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg font-bold text-primary-container">
             M. RUPAN VIJAY
         </div>
-<div className="hidden md:flex space-x-6">
-<a className="font-label-mono text-label-mono uppercase tracking-widest text-secondary-container border-b-2 border-secondary-container pb-1" href="#home">HOME</a>
-<a className="font-label-mono text-label-mono uppercase tracking-widest text-primary-container opacity-70 hover:opacity-100 transition-opacity" href="#about">ABOUT</a>
-<a className="font-label-mono text-label-mono uppercase tracking-widest text-primary-container opacity-70 hover:opacity-100 transition-opacity" href="#skills">SKILLS</a>
-<a className="font-label-mono text-label-mono uppercase tracking-widest text-primary-container opacity-70 hover:opacity-100 transition-opacity" href="#journey">JOURNEY</a>
-<a className="font-label-mono text-label-mono uppercase tracking-widest text-primary-container opacity-70 hover:opacity-100 transition-opacity" href="#portfolio">PORTFOLIO</a>
+<div className="hidden md:flex space-x-6 items-center">
+<a className="font-label-mono text-label-mono uppercase tracking-widest text-secondary-container border-b-2 border-secondary-container magnetic-el px-2 py-1 hover:bg-secondary-container hover:text-white" href="#home">HOME</a>
+<a className="font-label-mono text-label-mono uppercase tracking-widest text-primary-container opacity-70 hover:opacity-100 magnetic-el px-2 py-1 hover:bg-primary-container hover:text-surface" href="#about">ABOUT</a>
+<a className="font-label-mono text-label-mono uppercase tracking-widest text-primary-container opacity-70 hover:opacity-100 magnetic-el px-2 py-1 hover:bg-primary-container hover:text-surface" href="#skills">SKILLS</a>
+<a className="font-label-mono text-label-mono uppercase tracking-widest text-primary-container opacity-70 hover:opacity-100 magnetic-el px-2 py-1 hover:bg-primary-container hover:text-surface" href="#journey">JOURNEY</a>
+<a className="font-label-mono text-label-mono uppercase tracking-widest text-primary-container opacity-70 hover:opacity-100 magnetic-el px-2 py-1 hover:bg-primary-container hover:text-surface" href="#portfolio">PORTFOLIO</a>
 </div>
 <div className="flex items-center gap-4">
-<button className="flex items-center gap-2 px-3 py-1 border border-primary-container/20 rounded-none hover:bg-primary-container/5 transition-colors" id="themeToggle">
-<span className="material-symbols-outlined text-sm" id="themeIcon">light_mode</span>
+<button className="flex items-center gap-2 px-3 py-1 border border-primary-container/20 rounded-none magnetic-el hover:bg-primary-container hover:text-surface" id="themeToggle">
+<span className="material-symbols-outlined text-sm icon-shift inline-block" id="themeIcon">light_mode</span>
 <span className="font-label-mono-sm text-label-mono-sm hidden sm:inline text-primary-container" id="themeText">MODE_01: WHITEPRINT</span>
 </button>
 </div>
@@ -147,8 +214,8 @@ export default function Home() {
 <p className="font-body-lg text-body-lg text-primary-container/80 mb-4">B.Tech Mechanical Engineering — VIT Chennai</p>
 <p className="font-body-md text-body-md italic text-primary-container/60 mb-12 border-l-2 border-secondary-container pl-4">"Education is the premise of progress."</p>
 <div className="flex gap-4">
-<a className="px-6 py-3 bg-secondary-container text-white font-label-mono text-label-mono uppercase tracking-widest hover:bg-[#e66a12] transition-colors" href="#about">More About Me</a>
-<a className="px-6 py-3 border border-primary-container text-primary-container font-label-mono text-label-mono uppercase tracking-widest hover:bg-primary-container/5 transition-colors" href="#">Download Resume</a>
+<a className="magnetic-el px-6 py-3 bg-secondary-container text-white font-label-mono text-label-mono uppercase tracking-widest hover:bg-white hover:text-secondary-container" href="#about">More About Me</a>
+<a className="magnetic-el px-6 py-3 border border-primary-container text-primary-container font-label-mono text-label-mono uppercase tracking-widest hover:bg-primary-container hover:text-white" href="#">Download Resume</a>
 </div>
 </div>
 </div>
@@ -172,7 +239,7 @@ export default function Home() {
 <li className="flex border-b border-primary-container/10 pb-2"><span className="w-32 text-primary-container/60">HIGHLIGHT</span> <span className="">University Rank Holder</span></li>
 <li className="flex border-b border-primary-container/10 pb-2"><span className="w-32 text-primary-container/60">DOB</span> <span className="">April 5, 2007</span></li><li className="flex border-b border-primary-container/10 pb-2"><span className="w-32 text-primary-container/60">MINORS</span> <span className="">Full Stack Development, Business Enthusiast</span></li></ul>
 <div className="flex gap-4">
-<a className="px-6 py-3 bg-secondary-container text-white font-label-mono text-label-mono uppercase tracking-widest hover:bg-[#e66a12] transition-colors" href="#contact">Get In Touch</a>
+<a className="magnetic-el px-6 py-3 bg-secondary-container text-white font-label-mono text-label-mono uppercase tracking-widest hover:bg-white hover:text-secondary-container" href="#contact">Get In Touch</a>
 </div>
 </div>
 </div>
@@ -185,60 +252,60 @@ export default function Home() {
 <div>
 <div className="flex justify-between font-label-mono text-label-mono mb-2">
 <span className="">SolidWorks</span>
-<span className="">80%</span>
+<span className="skill-counter" data-target="80">0%</span>
 </div>
 <div className="h-4 border border-primary-container/30 p-[1px] w-full bg-surface">
-<div className="h-full bg-secondary-container w-0 transition-all duration-1000 ease-out skill-bar" data-width="80%" style={{"width":"80%"}}></div>
+<div className="h-full bg-secondary-container w-0 transition-all duration-[1200ms] ease-[cubic-bezier(0.215,0.61,0.355,1)] skill-bar" data-width="80%"></div>
 </div>
 </div>
 {/* Skill Item */}
 <div>
 <div className="flex justify-between font-label-mono text-label-mono mb-2">
 <span className="">MATLAB</span>
-<span className="">75%</span>
+<span className="skill-counter" data-target="75">0%</span>
 </div>
 <div className="h-4 border border-primary-container/30 p-[1px] w-full bg-surface">
-<div className="h-full bg-secondary-container w-0 transition-all duration-1000 ease-out delay-100 skill-bar" data-width="75%" style={{"width":"75%"}}></div>
+<div className="h-full bg-secondary-container w-0 transition-all duration-[1200ms] ease-[cubic-bezier(0.215,0.61,0.355,1)] delay-100 skill-bar" data-width="75%"></div>
 </div>
 </div>
 {/* Skill Item */}
 <div>
 <div className="flex justify-between font-label-mono text-label-mono mb-2">
 <span className="">AutoCAD</span>
-<span className="">85%</span>
+<span className="skill-counter" data-target="85">0%</span>
 </div>
 <div className="h-4 border border-primary-container/30 p-[1px] w-full bg-surface">
-<div className="h-full bg-secondary-container w-0 transition-all duration-1000 ease-out delay-150 skill-bar" data-width="85%" style={{"width":"85%"}}></div>
+<div className="h-full bg-secondary-container w-0 transition-all duration-[1200ms] ease-[cubic-bezier(0.215,0.61,0.355,1)] delay-150 skill-bar" data-width="85%"></div>
 </div>
 </div>
 {/* Skill Item */}
 <div>
 <div className="flex justify-between font-label-mono text-label-mono mb-2">
 <span className="">Python</span>
-<span className="">70%</span>
+<span className="skill-counter" data-target="70">0%</span>
 </div>
 <div className="h-4 border border-primary-container/30 p-[1px] w-full bg-surface">
-<div className="h-full bg-secondary-container w-0 transition-all duration-1000 ease-out delay-200 skill-bar" data-width="70%" style={{"width":"70%"}}></div>
+<div className="h-full bg-secondary-container w-0 transition-all duration-[1200ms] ease-[cubic-bezier(0.215,0.61,0.355,1)] delay-200 skill-bar" data-width="70%"></div>
 </div>
 </div>
 {/* Skill Item */}
 <div>
 <div className="flex justify-between font-label-mono text-label-mono mb-2">
 <span className="">Java</span>
-<span className="">65%</span>
+<span className="skill-counter" data-target="65">0%</span>
 </div>
 <div className="h-4 border border-primary-container/30 p-[1px] w-full bg-surface">
-<div className="h-full bg-secondary-container w-0 transition-all duration-1000 ease-out delay-300 skill-bar" data-width="65%" style={{"width":"65%"}}></div>
+<div className="h-full bg-secondary-container w-0 transition-all duration-[1200ms] ease-[cubic-bezier(0.215,0.61,0.355,1)] delay-300 skill-bar" data-width="65%"></div>
 </div>
 </div>
 {/* Skill Item */}
 <div>
 <div className="flex justify-between font-label-mono text-label-mono mb-2">
 <span className="">LTspice</span>
-<span className="">75%</span>
+<span className="skill-counter" data-target="75">0%</span>
 </div>
 <div className="h-4 border border-primary-container/30 p-[1px] w-full bg-surface">
-<div className="h-full bg-secondary-container w-0 transition-all duration-1000 ease-out delay-400 skill-bar" data-width="75%" style={{"width":"75%"}}></div>
+<div className="h-full bg-secondary-container w-0 transition-all duration-[1200ms] ease-[cubic-bezier(0.215,0.61,0.355,1)] delay-400 skill-bar" data-width="75%"></div>
 </div>
 </div>
 </div>
@@ -267,40 +334,53 @@ export default function Home() {
 {/* Journey Section */}
 <section className="py-24 px-margin-desktop max-w-screen-2xl mx-auto" id="journey">
 <h2 className="font-headline-md text-headline-md mb-16 text-center scroll-fade visible">TIMELINE &amp; ACHIEVEMENTS</h2>
-<div className="relative max-w-2xl mx-auto border-l border-dashed border-primary-container/30 pl-8 space-y-12 scroll-fade visible">{/* VIT Chennai */}
-<div className="relative">
-<div className="absolute w-2 h-2 bg-secondary-container rotate-45 -left-[37px] top-2"></div>
+<div className="relative max-w-2xl mx-auto pl-8 space-y-12 timeline-container">
+<div className="absolute left-0 top-0 bottom-0 w-px border-l border-dashed border-primary-container/30 opacity-20"></div>
+<div className="absolute left-0 top-0 w-px border-l-2 border-primary-container timeline-line" style={{ height: '0%' }}></div>
+{/* VIT Chennai */}
+<div className="relative timeline-item">
+<div className="absolute w-2 h-2 bg-secondary-container -left-[37px] top-2 timeline-dot"></div>
+<div className="timeline-content">
 <div className="font-label-mono-sm text-label-mono-sm text-primary-container/60 mb-1">2025 - 2029</div>
 <h3 className="font-headline-md text-headline-md mb-2">VIT Chennai</h3>
 <p className="font-body-md text-body-md text-primary-container/80">B.Tech Mechanical Engineering. Current CGPA: 9.02</p>
 </div>
+</div>
 {/* CS Academy */}
-<div className="relative">
-<div className="absolute w-2 h-2 bg-secondary-container rotate-45 -left-[37px] top-2"></div>
+<div className="relative timeline-item">
+<div className="absolute w-2 h-2 bg-secondary-container -left-[37px] top-2 timeline-dot"></div>
+<div className="timeline-content">
 <div className="font-label-mono-sm text-label-mono-sm text-primary-container/60 mb-1">2018 - 2024</div>
 <h3 className="font-headline-md text-headline-md mb-2">CS Academy</h3>
 <p className="font-body-md text-body-md text-primary-container/80">Foundation and Schooling. Strong foundational education setting the premise for engineering.</p>
 </div>
+</div>
 {/* Royal International School */}
-<div className="relative">
-<div className="absolute w-2 h-2 bg-secondary-container rotate-45 -left-[37px] top-2"></div>
+<div className="relative timeline-item">
+<div className="absolute w-2 h-2 bg-secondary-container -left-[37px] top-2 timeline-dot"></div>
+<div className="timeline-content">
 <div className="font-label-mono-sm text-label-mono-sm text-primary-container/60 mb-1">2015 - 2017</div>
 <h3 className="font-headline-md text-headline-md mb-2">Royal International School</h3>
 <p className="font-body-md text-body-md text-primary-container/80">Primary and Middle School education.</p>
 </div>
+</div>
 {/* SSM Central School */}
-<div className="relative">
-<div className="absolute w-2 h-2 bg-secondary-container rotate-45 -left-[37px] top-2"></div>
+<div className="relative timeline-item">
+<div className="absolute w-2 h-2 bg-secondary-container -left-[37px] top-2 timeline-dot"></div>
+<div className="timeline-content">
 <div className="font-label-mono-sm text-label-mono-sm text-primary-container/60 mb-1">2011 - 2014</div>
 <h3 className="font-headline-md text-headline-md mb-2">SSM Central School</h3>
 <p className="font-body-md text-body-md text-primary-container/80">Early Schooling years.</p>
 </div>
+</div>
 {/* Euro Kids */}
-<div className="relative">
-<div className="absolute w-2 h-2 bg-secondary-container rotate-45 -left-[37px] top-2"></div>
+<div className="relative timeline-item">
+<div className="absolute w-2 h-2 bg-secondary-container -left-[37px] top-2 timeline-dot"></div>
+<div className="timeline-content">
 <div className="font-label-mono-sm text-label-mono-sm text-primary-container/60 mb-1">2009 - 2010</div>
 <h3 className="font-headline-md text-headline-md mb-2">Euro Kids</h3>
 <p className="font-body-md text-body-md text-primary-container/80">Pre-School: The foundational start of the educational journey.</p>
+</div>
 </div></div>
 </section>
 {/* Extracurriculars & Languages Section */}
@@ -457,8 +537,8 @@ export default function Home() {
 </div>
 </div>
 <div className="flex justify-center">
-<a className="px-8 py-4 border-2 font-label-mono text-label-mono uppercase tracking-widest transition-all duration-300 hover:bg-primary-container/5 text-primary-container border-primary-container" href="#portfolio">
-        View Project Archive →
+<a className="magnetic-el px-8 py-4 border-2 font-label-mono text-label-mono uppercase tracking-widest transition-all duration-300 hover:bg-primary-container hover:text-white text-primary-container border-primary-container" href="#portfolio">
+        View Project Archive <span className="icon-shift inline-block ml-1">→</span>
       </a>
 </div>
 </div>
@@ -467,45 +547,33 @@ export default function Home() {
 <section className="py-24 px-margin-desktop max-w-screen-2xl mx-auto border-t border-primary-container/10" id="portfolio">
 <h2 className="font-headline-md text-headline-md mb-12 text-center scroll-fade visible">PROJECT ARCHIVE</h2>
 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 scroll-fade visible">
-{/* Project Card 1 */}
-<div className="border border-primary-container/20 bg-surface group overflow-hidden">
-<div className="h-48 border-b border-primary-container/20 relative overflow-hidden">
-<img alt="AI-Driven Intelligent Liquid Cooling Vest" className="w-full h-full object-cover grayscale opacity-80 group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida/AP1WRLsoDzxWz4IQyJHhunPn1FfDj0ii_tMGYQUecBAsFri4zsNdReO7nCdZ_O_aHeswVLdIPeVP6fk8-3IQWdyo6STUfBTS4IREeCLZmlTV3r9Ue58odBes4hQsjNE5BnYGVeODY_VXEgYYD88kJTuVsg8uSSVz041I7Zx-a_V4fKvTmApI4wV-6sTZ2-KuE8oLp4Fw-IDmxSN9N7o5xw44M_9H9N6zLABAnMD007m7Ly3VkFOIR6ToOrOLeWpm" />
-<div className="absolute top-2 right-2 bg-secondary-container text-white px-2 py-1 font-label-mono-sm text-label-mono-sm uppercase tracking-widest">TEAM</div>
-</div>
-<div className="p-6 relative">
-<div className="font-label-mono-sm text-label-mono-sm text-primary-container/60 mb-2">PROJ_01</div>
-<h3 className="font-headline-md text-headline-md mb-2">AI-Driven Intelligent Liquid Cooling Vest</h3>
-<p className="font-label-mono text-label-mono text-secondary-container mb-2">Adaptive Thermal Regulation System</p>
-<p className="font-body-md text-body-md text-primary-container/80 mb-4">Interdisciplinary project (1st Sem) focused on a group of 5 students from various engineering branches. Developed an AI-driven system for adaptive thermal regulation using liquid cooling technology.</p>
-<div className="flex items-center gap-2 font-label-mono-sm text-label-mono-sm text-primary-container/60">
-<span className="material-symbols-outlined text-sm">groups</span>
-<span className="">Group of 5 (Interdisciplinary)</span>
-</div>
-</div>
-</div>
-{/* Project Card 2 */}
-<div className="border border-primary-container/20 bg-surface group overflow-hidden">
-<div className="h-48 border-b border-primary-container/20 relative overflow-hidden">
-<img alt="Project Coming Soon" className="w-full h-full object-cover grayscale opacity-80 group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAVWHnbPxWWu47Boqpf7Pz1BiZLa4MYUUnr4TR59xjFhq1n60FP5mYNDUbYpUVaoQq_fuaOcqNTOvDUwoEWUjC9DR8w5Aq2rb_FMZkPbliFicb1v-nxt3t1yEc7zE7mMgQCjHKAI1NoodXFJ8KhqXEzr0T64WWcf1pEmr1yuPxkPz-Z9SuO8wEUyydthgjSkpbOfiU1ZJ9PI9yfTQZP2SSPxqJq-6yzJeV7SDWuwVLF2odny6rkP_zViQcHL5JF443V-geaOgoAe9VI" />
-</div>
-<div className="p-6 relative">
-<div className="font-label-mono-sm text-label-mono-sm text-primary-container/60 mb-2">PROJ_02</div>
-<h3 className="font-headline-md text-headline-md mb-2">Thermal Simulation</h3>
-<p className="font-label-mono text-label-mono text-secondary-container mb-4">MATLAB</p>
-</div>
-</div>
-{/* Project Card 3 */}
-<div className="border border-primary-container/20 bg-surface group overflow-hidden">
-<div className="h-48 border-b border-primary-container/20 relative overflow-hidden">
-<img alt="Project Coming Soon" className="w-full h-full object-cover grayscale opacity-80 group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAVWHnbPxWWu47Boqpf7Pz1BiZLa4MYUUnr4TR59xjFhq1n60FP5mYNDUbYpUVaoQq_fuaOcqNTOvDUwoEWUjC9DR8w5Aq2rb_FMZkPbliFicb1v-nxt3t1yEc7zE7mMgQCjHKAI1NoodXFJ8KhqXEzr0T64WWcf1pEmr1yuPxkPz-Z9SuO8wEUyydthgjSkpbOfiU1ZJ9PI9yfTQZP2SSPxqJq-6yzJeV7SDWuwVLF2odny6rkP_zViQcHL5JF443V-geaOgoAe9VI" />
-</div>
-<div className="p-6 relative">
-<div className="font-label-mono-sm text-label-mono-sm text-primary-container/60 mb-2">PROJ_03</div>
-<h3 className="font-headline-md text-headline-md mb-2">Data Analysis Script</h3>
-<p className="font-label-mono text-label-mono text-secondary-container mb-4">Python</p>
-</div>
-</div>
+{projectsData.map((project, index) => (
+  <div 
+    key={project.id}
+    className="border border-primary-container/20 bg-surface group overflow-hidden project-card-reveal relative cursor-pointer hover:border-secondary-container transition-colors duration-300"
+    onClick={() => setSelectedProject(project)}
+    style={{ animationDelay: `${index * 150}ms` }}
+  >
+    <div className="h-48 border-b border-primary-container/20 relative overflow-hidden">
+      <img alt={project.title} className="w-full h-full object-cover grayscale opacity-80 group-hover:scale-105 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-700" src={project.image} />
+      {project.team && (
+        <div className="absolute top-2 right-2 bg-secondary-container text-white px-2 py-1 font-label-mono-sm text-label-mono-sm uppercase tracking-widest">TEAM</div>
+      )}
+    </div>
+    <div className="p-6 relative flex flex-col h-[calc(100%-12rem)]">
+      <div className="font-label-mono-sm text-label-mono-sm text-primary-container/60 mb-2">{project.id}</div>
+      <h3 className="font-headline-md text-headline-md mb-2">{project.title}</h3>
+      <p className="font-label-mono text-label-mono text-secondary-container mb-4">{project.subtitle}</p>
+      
+      {project.team && (
+        <div className="mt-auto pt-4 flex items-center gap-2 font-label-mono-sm text-label-mono-sm text-primary-container/60">
+          <span className="material-symbols-outlined text-sm">groups</span>
+          <span className="">{project.team}</span>
+        </div>
+      )}
+    </div>
+  </div>
+))}
 </div>
 </section>
 {/* Contact Section */}
@@ -530,7 +598,7 @@ export default function Home() {
 <label className="font-label-mono-sm text-label-mono-sm text-primary-container/60 block mb-1">MESSAGE</label>
 <textarea className="w-full input-underline text-primary-container py-2 font-label-mono text-label-mono h-24 resize-none" placeholder="Transmit message..."></textarea>
 </div>
-<button className="px-8 py-3 bg-secondary-container text-white font-label-mono text-label-mono uppercase tracking-widest hover:bg-[#e66a12] transition-colors w-full border border-secondary-container" type="button">
+<button className="magnetic-el px-8 py-3 bg-secondary-container text-white font-label-mono text-label-mono uppercase tracking-widest hover:bg-white hover:text-secondary-container w-full border border-secondary-container" type="button">
                             SEND TRANSMISSION
                         </button>
 </form>
@@ -564,8 +632,41 @@ export default function Home() {
 </div>
 </footer>
 
+      {/* Detail Modal */}
+      {selectedProject && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-8">
+          <div className="absolute inset-0 bg-surface-container-high/60 backdrop-blur-md transition-opacity duration-300" onClick={() => setSelectedProject(null)}></div>
+          <div className="relative w-full max-w-5xl h-[80vh] bg-surface border border-primary-container/30 flex flex-col md:flex-row shadow-2xl animate-modal-pop">
+            <button 
+              onClick={() => setSelectedProject(null)}
+              className="magnetic-el absolute top-4 right-4 z-10 font-label-mono text-label-mono bg-primary-container text-surface px-4 py-2 hover:bg-secondary-container hover:text-white transition-colors flex items-center gap-2"
+            >
+              <span className="material-symbols-outlined text-sm">close</span> TERMINATE
+            </button>
 
+            <div className="w-full md:w-1/2 h-64 md:h-full bg-surface-container-low border-b md:border-b-0 md:border-r border-primary-container/20 relative">
+              <img src={selectedProject.image} alt={selectedProject.title} className="w-full h-full object-cover grayscale opacity-90" />
+              <div className="absolute inset-0 bg-gradient-to-t from-surface to-transparent opacity-50 md:hidden"></div>
+            </div>
+            
+            <div className="w-full md:w-1/2 p-8 md:p-12 flex flex-col overflow-y-auto bg-surface relative">
+              <div className="font-label-mono-sm text-label-mono-sm text-primary-container/60 mb-6">{selectedProject.id} // SECURE_ARCHIVE</div>
+              <h2 className="font-headline-lg text-headline-lg mb-4 pr-32">{selectedProject.title}</h2>
+              <h3 className="font-label-mono text-label-mono text-secondary-container mb-8 border-l-2 border-secondary-container pl-4">{selectedProject.subtitle}</h3>
+              
+              <div className="font-body-lg text-body-lg text-primary-container/90 leading-relaxed mb-8 flex-grow">
+                {selectedProject.description}
+              </div>
 
+              {selectedProject.team && (
+                <div className="mt-auto pt-8 border-t border-primary-container/20 flex items-center gap-3 font-label-mono text-label-mono text-primary-container/80">
+                  <span className="material-symbols-outlined">groups</span> {selectedProject.team}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );

@@ -174,12 +174,104 @@
         
         .input-underline {
             border: none;
-            border-bottom: 1px solid theme('colors.primary-container');
+            border-bottom: 1px solid var(--color-primary-container);
             background: transparent;
             border-radius: 0;
         }
         .input-underline:focus {
             box-shadow: none;
-            border-bottom-color: theme('colors.secondary-container');
+            border-bottom-color: var(--color-secondary-container);
         }
-    
+
+        .project-card-reveal {
+            opacity: 0;
+            transform: scale(0.95);
+            transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .project-card-reveal.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .project-card-reveal::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            pointer-events: none;
+            background-image: 
+                linear-gradient(var(--color-primary-container), var(--color-primary-container)),
+                linear-gradient(var(--color-primary-container), var(--color-primary-container)),
+                linear-gradient(var(--color-primary-container), var(--color-primary-container)),
+                linear-gradient(var(--color-primary-container), var(--color-primary-container));
+            background-repeat: no-repeat;
+            background-position: 
+                0 0,       
+                100% 0,    
+                100% 100%, 
+                0 100%;    
+            background-size: 0 1px, 1px 0, 0 1px, 1px 0;
+        }
+
+        .project-card-reveal.visible::after {
+            animation: drawBorderClockwise 0.5s linear forwards;
+        }
+
+        @keyframes drawBorderClockwise {
+            0%   { background-size: 0 1px, 1px 0, 0 1px, 1px 0; }
+            25%  { background-size: 100% 1px, 1px 0, 0 1px, 1px 0; }
+            50%  { background-size: 100% 1px, 1px 100%, 0 1px, 1px 0; }
+            75%  { background-size: 100% 1px, 1px 100%, 100% 1px, 1px 0; }
+            100% { background-size: 100% 1px, 1px 100%, 100% 1px, 1px 100%; }
+        }
+
+        .magnetic-el {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), background-color 0.3s ease, color 0.3s ease;
+        }
+        
+        .magnetic-el:hover {
+            transition: transform 0.1s linear, background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .icon-shift {
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .magnetic-el:hover .icon-shift {
+            transform: translateX(4px);
+        }
+
+        .timeline-dot {
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.5s ease-out;
+        }
+        .timeline-item:not(.visible) .timeline-dot {
+            transform: scale(0) rotate(45deg);
+            opacity: 0;
+        }
+        .timeline-item.visible .timeline-dot {
+            transform: scale(1) rotate(45deg);
+            opacity: 1;
+        }
+
+        .timeline-content {
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s ease-out;
+        }
+        .timeline-item:not(.visible) .timeline-content {
+            transform: translateX(-30px);
+            opacity: 0;
+        }
+        .timeline-item.visible .timeline-content {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .animate-modal-pop {
+            animation: modalPop 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+    @keyframes modalPop {
+        0% { opacity: 0; transform: scale(0.95); }
+        100% { opacity: 1; transform: scale(1); }
+    }
