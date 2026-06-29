@@ -1,8 +1,38 @@
 "use client";
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 
 export default function Home() {
+  const [heroPhase, setHeroPhase] = useState(0); 
+  const [typedName, setTypedName] = useState("");
+
+  useEffect(() => {
+    const phase1Timer = setTimeout(() => {
+      setHeroPhase(1);
+    }, 1500);
+    return () => clearTimeout(phase1Timer);
+  }, []);
+
+  useEffect(() => {
+    if (heroPhase === 1) {
+      const fullName = "M. Rupan Vijay";
+      let i = 0;
+      const typeDuration = 800;
+      const intervalTime = typeDuration / fullName.length;
+      const typeInterval = setInterval(() => {
+        setTypedName(fullName.slice(0, i + 1));
+        i++;
+        if (i === fullName.length) {
+          clearInterval(typeInterval);
+          setTimeout(() => setHeroPhase(2), 100); 
+        }
+      }, intervalTime);
+      return () => clearInterval(typeInterval);
+    } else if (heroPhase === 2) {
+      setTypedName("M. Rupan Vijay");
+    }
+  }, [heroPhase]);
+
   useEffect(() => {
     // Scroll animations & Skill Bars
     const observerOptions = {
@@ -101,13 +131,25 @@ export default function Home() {
 <section className="relative min-h-[calc(100vh-64px)] flex items-center px-margin-desktop max-w-screen-2xl mx-auto overflow-hidden" id="home">
 <div className="absolute inset-0 pointer-events-none" style={{"backgroundImage":"url('https://lh3.googleusercontent.com/aida-public/AB6AXuBXc94tr35NO3nX8Yy_iPACob9Pq8nswHBbnfZX6L-OcoKGz5__VEJ4UXoSZkIxtAh2d87sTAfpmm0DutSKeG0ZBkY1sw97vSR2tG1bcnJD-5cyJekMR6hBft26_dPwh6hJHgc5VX6mdjhdiKSRqohODUv6Gxkh5luav0w7Wu6O_nj6znE6OPSPnAlFjM63FkqWHaFEfLzJgyiJ38bzYmmdXrUgupHj4tzgGlUIaRdafQTcWncUgKNS23Hlf1L3EbZ7sL7tzFQmb95z')","backgroundSize":"cover","backgroundPosition":"center","mixBlendMode":"multiply","opacity":"0.05"}}></div>
 <div className="relative z-10 max-w-3xl scroll-fade visible">
-<p className="font-label-mono text-label-mono text-secondary-container mb-4">MODE: INITIALIZE</p>
-<h2 className="font-headline-lg text-headline-lg mb-6 text-5xl">M. Rupan Vijay</h2>
+<p className="font-label-mono text-label-mono text-secondary-container mb-4 flex items-center gap-2">
+  MODE: INITIALIZE
+  {heroPhase === 0 && (
+    <span className="inline-block w-[10px] h-[18px] bg-green-500 animate-pulse" style={{ animationDuration: '0.5s' }}></span>
+  )}
+</p>
+<h2 className="font-headline-lg text-headline-lg mb-6 text-5xl min-h-[60px] flex items-center">
+  {heroPhase === 0 ? "" : typedName}
+  {heroPhase === 1 && (
+    <span className="inline-block w-4 h-10 bg-primary-container ml-1 animate-pulse"></span>
+  )}
+</h2>
+<div className={`transition-all duration-700 ease-out ${heroPhase === 2 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-[15px]'}`}>
 <p className="font-body-lg text-body-lg text-primary-container/80 mb-4">B.Tech Mechanical Engineering — VIT Chennai</p>
 <p className="font-body-md text-body-md italic text-primary-container/60 mb-12 border-l-2 border-secondary-container pl-4">"Education is the premise of progress."</p>
 <div className="flex gap-4">
 <a className="px-6 py-3 bg-secondary-container text-white font-label-mono text-label-mono uppercase tracking-widest hover:bg-[#e66a12] transition-colors" href="#about">More About Me</a>
 <a className="px-6 py-3 border border-primary-container text-primary-container font-label-mono text-label-mono uppercase tracking-widest hover:bg-primary-container/5 transition-colors" href="#">Download Resume</a>
+</div>
 </div>
 </div>
 </section>
