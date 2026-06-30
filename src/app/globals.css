@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   /* Colors */
   --color-cosmic-bg: #030811;
@@ -14,13 +16,19 @@
 }
 
 body {
-  background-color: var(--color-cosmic-bg);
-  color: var(--color-text-main);
+  background-color: #f8fafc;
+  color: #0f172a;
   margin: 0;
   padding: 0;
   width: 100%;
   min-height: 100vh;
   font-family: ui-sans-serif, system-ui, sans-serif;
+  transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+.dark body {
+  background-color: var(--color-cosmic-bg);
+  color: var(--color-text-main);
 }
 
 .cosmic-bg {
@@ -90,16 +98,27 @@ body {
   border-radius: 16px;
 }
 
+.hero-profile-panel {
+  background: rgba(5, 15, 30, 0.72);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(0, 255, 204, 0.35);
+  border-radius: 14px;
+  padding: 2rem 2.5rem;
+  box-shadow: 0 0 40px rgba(0, 255, 204, 0.06), 0 8px 32px rgba(0,0,0,0.5);
+}
+
 .btn-holographic {
   background: rgba(0, 255, 204, 0.05);
   border: 1px solid rgba(0, 255, 204, 0.5);
   color: var(--color-text-main);
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
+  padding: 0.6rem 1.4rem;
+  border-radius: 6px;
   transition: all 0.3s ease;
   text-transform: uppercase;
   font-size: 0.75rem;
   letter-spacing: 1px;
+  cursor: pointer;
 }
 
 .btn-holographic:hover {
@@ -107,6 +126,7 @@ body {
   box-shadow: 0 0 15px rgba(0, 255, 204, 0.4);
   color: var(--color-cyan-glow);
 }
+
 
 .text-glow {
   text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
@@ -238,4 +258,48 @@ body {
 }
 .animate-modal-pop {
     animation: modalPop 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Unified 2D Orbital System */
+@keyframes orbit-path-anim {
+    0% { offset-distance: 0%; }
+    100% { offset-distance: 100%; }
+}
+
+@keyframes orbit-z-anim {
+    /* Front half (0% to 50%) */
+    0%, 49.99% { z-index: 30; filter: brightness(1.2); }
+    /* Back half (50% to 100%) */
+    50%, 100% { z-index: 10; filter: brightness(0.3); }
+}
+
+/* Remove old 3D elements below */
+
+.portrait-wrapper {
+    transform: translateX(-320px);
+}
+
+.portrait-hologram-3d {
+    position: absolute; top: 50%; left: 50%; width: 420px;
+    /* mix-blend-mode removed — portrait is now fully visible */
+    transform: translate(-50%, -50%);
+}
+
+.profile-wrapper {
+    transform: translateX(-650px);
+}
+
+.profile-panel-3d {
+    position: absolute; top: 50%; left: 50%;
+    /* No 3D rotation — panel displays upright and readable */
+    transform: translate(-50%, -50%);
+    width: 420px;
+    padding: 2rem 2.5rem;
+    background: var(--color-panel-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--color-panel-border);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 0 30px rgba(0, 255, 204, 0.05);
+    pointer-events: auto;
 }
